@@ -3,6 +3,7 @@ package com.nsicyber.mojimapper.data.repository
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import com.nsicyber.mojimapper.common.Constants
 import com.nsicyber.mojimapper.data.model.EmojiData
 import com.nsicyber.mojimapper.domain.mapFunctions.toDomainModel
 import com.nsicyber.mojimapper.domain.model.EmojiMapModel
@@ -23,7 +24,7 @@ class FirestoreRepositoryImpl @Inject constructor(
 ) : FirestoreRepository {
 
     private val geoFirestore: GeoFirestore by lazy {
-        GeoFirestore(firestore.collection("emojis"))
+        GeoFirestore(firestore.collection(Constants.Firestore.COLLECTION))
     }
 
 
@@ -31,7 +32,7 @@ class FirestoreRepositoryImpl @Inject constructor(
     ) {
 
 
-        firestore.collection("emojis")
+        firestore.collection(Constants.Firestore.COLLECTION)
             .whereLessThan("timestamp", System.currentTimeMillis() - (2 * 60 * 60 * 1000))
             .get()
             .addOnSuccessListener { querySnapshot ->
@@ -108,7 +109,7 @@ class FirestoreRepositoryImpl @Inject constructor(
 
 
     override suspend fun sendData(data: EmojiData): Flow<Result<String>> = callbackFlow {
-        val documentRef = firestore.collection("emojis").document()
+        val documentRef = firestore.collection(Constants.Firestore.COLLECTION).document()
         val geoPoint = GeoPoint(data.latitude, data.longitude)
 
         try {

@@ -7,4 +7,8 @@ object Constants {
         val CAMERA_SCREEN = "camera_screen"
     }
 
+    object Firestore{
+        val COLLECTION="emojis"
+    }
+
 }
