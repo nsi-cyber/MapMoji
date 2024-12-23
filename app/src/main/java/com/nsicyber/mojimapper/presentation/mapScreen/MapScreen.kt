@@ -148,14 +148,11 @@ fun MapScreen(
                     }
 
                     .align(Alignment.BottomCenter)
-                    .border(
-                        BorderStroke(2.dp, Color.White.copy(alpha = 0.8f)),
-                        RoundedCornerShape(12.dp)
-                    )
-                    .background(Color.Black.copy(alpha = 0.5f))
+
+                    .background(Color.White)
                     .padding(12.dp)
                 ) {
-                    Text(text = "Search for Moji's")
+                    Text(text = "Search for Moji's", color = Color.Black)
 
                 }
             }
