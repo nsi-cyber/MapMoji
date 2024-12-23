@@ -1,10 +1,8 @@
 package com.nsicyber.mojimapper.domain.useCases
 
-import com.nsicyber.mojimapper.data.model.EmojiData
 import com.nsicyber.mojimapper.domain.model.EmojiMapModel
 import com.nsicyber.mojimapper.domain.repository.FirestoreRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class GetMapDataUseCase  @Inject

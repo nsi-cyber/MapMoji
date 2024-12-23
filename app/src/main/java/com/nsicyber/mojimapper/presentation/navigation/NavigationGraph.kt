@@ -1,6 +1,7 @@
 package com.nsicyber.mojimapper.presentation.navigation
 
 import android.content.Context
+import android.content.pm.PackageManager
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -10,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -41,7 +43,6 @@ fun NavigationGraph(
     }
 
 
-
     val isMenuShow = remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
@@ -66,12 +67,17 @@ fun NavigationGraph(
                     mainViewModel = mainViewModel,
                     applicationContext = applicationContext,
                     onLocationRequest = requestLocationPermission,
-                    onCameraPage = { navActions.navigateToCameraScreen() }
+                    onCameraPage = {
+                        if (hasCameraPermission(applicationContext)) {
+                            navActions.navigateToCameraScreen()
+                        } else {
+                            requestCameraPermission()
+                        }
+                    }
                 )
             }
             composable(route = Constants.Destination.CAMERA_SCREEN) {
                 CameraScreen(
-                    mainViewModel = mainViewModel,
                     applicationContext = applicationContext,
                     onLocationRequest = requestLocationPermission,
                     onBackPressed = { navActions.popBackStack() }
@@ -83,4 +89,13 @@ fun NavigationGraph(
 
 
     }
+
 }
+
+fun hasCameraPermission(context: Context): Boolean {
+    return ContextCompat.checkSelfPermission(
+        context,
+        android.Manifest.permission.CAMERA
+    ) == PackageManager.PERMISSION_GRANTED
+}
+

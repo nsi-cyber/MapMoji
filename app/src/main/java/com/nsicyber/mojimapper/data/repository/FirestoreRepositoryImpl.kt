@@ -10,8 +10,8 @@ import com.nsicyber.mojimapper.domain.repository.FirestoreRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.tasks.await
 import org.imperiumlabs.geofirestore.GeoFirestore
+import org.imperiumlabs.geofirestore.extension.setLocation
 import org.imperiumlabs.geofirestore.listeners.GeoQueryDataEventListener
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -105,13 +105,43 @@ class FirestoreRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun sendData(data: EmojiData) {
+
+
+    override suspend fun sendData(data: EmojiData): Flow<Result<String>> = callbackFlow {
         val documentRef = firestore.collection("emojis").document()
-        documentRef.set(data.copy(id = documentRef.id)).await()
-        geoFirestore.setLocation(
-            documentRef.id,
-            GeoPoint(data.latitude, data.longitude)
-        )
+        val geoPoint = GeoPoint(data.latitude, data.longitude)
+
+        try {
+
+            // Save the data in Firestore
+            documentRef.set(data.copy(id = documentRef.id))
+                .addOnSuccessListener {
+                    // Data saved, now set the GeoFirestore location
+                    geoFirestore.setLocation(documentRef.id, geoPoint) { locationException ->
+                        if (locationException != null) {
+                            // Emit error if GeoFirestore operation fails
+                            trySend(Result.failure(locationException))
+                            close(locationException)
+                        } else {
+                            // Successfully completed
+                            trySend(Result.success("Data sent successfully"))
+                            close()
+                        }
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    // Emit error if Firestore operation fails
+                    trySend(Result.failure(exception))
+                    close(exception)
+                }
+        } catch (e: Exception) {
+            // Emit error for unexpected exceptions
+            trySend(Result.failure(e))
+            close(e)
+        }
+
+        // Close the flow when finished
+        awaitClose { }
     }
 
 }

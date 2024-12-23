@@ -9,14 +9,14 @@ import kotlinx.coroutines.flow.Flow
 interface FirestoreRepository {
     suspend fun deleteOldDataFromFirestore()
 
-    fun getMapData(
+     fun getMapData(
         latitude: Double,
         longitude: Double,
         radius: Double
     ): Flow<List<EmojiMapModel>>
 
 
-    suspend fun sendData(data: EmojiData)
+    suspend fun sendData(data: EmojiData): Flow<Result<String>>
 
 
 }

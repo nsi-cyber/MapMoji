@@ -88,7 +88,7 @@ fun MapScreen(
                 }
 
             },
-            onError = {},
+            onError = { onLocationRequest() },
             requestLocation = onLocationRequest
         )
 
@@ -171,7 +171,6 @@ fun MapScreen(
                     onLocationRetrieved = { location ->
                         val userLatLng = LatLng(location.latitude, location.longitude)
 
-                        // Güncelleme: Kamera pozisyonunu kullanıcının konumuna taşıyoruz
                         scope.launch {
                             cameraPositionState.animate(
                                 CameraUpdateFactory.newLatLngZoom(
@@ -183,7 +182,7 @@ fun MapScreen(
                         }
 
                     },
-                    onError = {},
+                    onError = {onLocationRequest()},
                     requestLocation = onLocationRequest
                 )
             }, icon = IconGPS

@@ -1,12 +1,15 @@
 package com.nsicyber.mojimapper
 
 import android.app.Activity
-import android.content.pm.PackageManager
+import android.content.Context
+import android.content.Intent
+import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.LaunchedEffect
+import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -29,149 +32,75 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MojiMapperTheme {
-                LaunchedEffect(Unit) {
-                    requestCameraPermission(
-                        this@MainActivity,
-                        onPermissionGranted = {
-                            hasCameraPermission.value = true
-
-                        }
-                    )
-                    requestLocationPermission(
-                        this@MainActivity,
-                        onPermissionGranted = {
-                            hasLocationPermission.value = true
-
-                        }
-                    )
-                }
                 NavigationGraph(applicationContext = this,
                     requestCameraPermission = {
-                        requestCameraPermission(
-                            this,
-                            onPermissionGranted = {
-                                hasCameraPermission.value = true
-
-                            }
+                        checkAndRequestCameraPermissionAndStatus(
+                            activity = this@MainActivity,
                         )
                     }, requestLocationPermission = {
-                        requestLocationPermission(
-                            this,
-                            onPermissionGranted = {
-                                hasLocationPermission.value = true
-
-                            }
+                        checkAndRequestGpsPermissionAndStatus(
+                            activity = this@MainActivity,
                         )
                     })
             }
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            CAMERA_PERMISSION_REQUEST_CODE -> {
-                handleCameraPermissionResult(
-                    requestCode,
-                    grantResults,
-                    onPermissionGranted = { hasCameraPermission.value = true },
-                    onPermissionDenied = { hasCameraPermission.value = false }
-                )
-            }
 
-            LOCATION_PERMISSION_REQUEST_CODE -> {
-                handleLocationPermissionResult(
-                    requestCode,
-                    grantResults,
-                    onPermissionGranted = { hasLocationPermission.value = true },
-                    onPermissionDenied = { hasLocationPermission.value = false }
-                )
-            }
+    private fun checkAndRequestGpsPermissionAndStatus(
+        activity: Activity,
+    ) {
+        val hasLocationPermission = ContextCompat.checkSelfPermission(
+            activity,
+            android.Manifest.permission.ACCESS_FINE_LOCATION
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+        if (!hasLocationPermission) {
+            ActivityCompat.requestPermissions(
+                activity,
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                100
+            )
+            return
+        }
+        val locationManager = activity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+
+        if (!isGpsEnabled) {
+            AlertDialog.Builder(activity)
+                .setTitle("GPS Kapalı")
+                .setMessage("Konum hizmetleri kapalı. Lütfen GPS'i etkinleştirin.")
+                .setPositiveButton("Ayarlar") { _, _ ->
+                    // Kullanıcıyı GPS ayarlarına yönlendir
+                    activity.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                }
+                .setNegativeButton("İptal") { _, _ -> }
+                .setCancelable(false)
+                .show()
         }
     }
-}
 
-fun requestCameraPermission(
-    activity: Activity,
-    onPermissionGranted: () -> Unit,
-) {
-    val locationPermission = android.Manifest.permission.CAMERA
-
-    if (ContextCompat.checkSelfPermission(
-            activity,
-            locationPermission
-        ) == PackageManager.PERMISSION_GRANTED
+    private fun checkAndRequestCameraPermissionAndStatus(
+        activity: Activity,
     ) {
-        // Kullanıcı izni daha önce verdi
-        onPermissionGranted()
-    } else {
-        // İzin verilmemiş, kullanıcıdan izin istemek için bir popup göster
-        ActivityCompat.requestPermissions(
+        val hasLocationPermission = ContextCompat.checkSelfPermission(
             activity,
-            arrayOf(locationPermission),
-            LOCATION_PERMISSION_REQUEST_CODE
-        )
-    }
-}
+            android.Manifest.permission.CAMERA
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
 
-fun requestLocationPermission(
-    activity: Activity,
-    onPermissionGranted: () -> Unit,
-) {
-    val locationPermission = android.Manifest.permission.ACCESS_FINE_LOCATION
+        if (!hasLocationPermission) {
+            ActivityCompat.requestPermissions(
+                activity,
+                arrayOf(android.Manifest.permission.CAMERA),
+                101
+            )
+            return
 
-    if (ContextCompat.checkSelfPermission(
-            activity,
-            locationPermission
-        ) == PackageManager.PERMISSION_GRANTED
-    ) {
-        // Kullanıcı izni daha önce verdi
-        onPermissionGranted()
-    } else {
-        // İzin verilmemiş, kullanıcıdan izin istemek için bir popup göster
-        ActivityCompat.requestPermissions(
-            activity,
-            arrayOf(locationPermission),
-            LOCATION_PERMISSION_REQUEST_CODE
-        )
-    }
-}
-
-fun handleCameraPermissionResult(
-    requestCode: Int,
-    grantResults: IntArray,
-    onPermissionGranted: () -> Unit,
-    onPermissionDenied: () -> Unit
-) {
-    if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
-        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // Lokasyon izni verildi
-            onPermissionGranted()
-        } else {
-            // Lokasyon izni reddedildi
-            onPermissionDenied()
         }
     }
+
+
+
 }
 
-fun handleLocationPermissionResult(
-    requestCode: Int,
-    grantResults: IntArray,
-    onPermissionGranted: () -> Unit,
-    onPermissionDenied: () -> Unit
-) {
-    if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // Lokasyon izni verildi
-            onPermissionGranted()
-        } else {
-            // Lokasyon izni reddedildi
-            onPermissionDenied()
-        }
-    }
-}
 

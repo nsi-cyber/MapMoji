@@ -59,6 +59,7 @@ class MainViewModel @Inject constructor(
             MainEvent.DeleteOldData -> deleteOldData()
         }
     }
+
     private fun deleteOldData(
 
     ) {
@@ -114,7 +115,19 @@ class MainViewModel @Inject constructor(
                                                 longitude = longitude,
                                                 latitude = latitude
                                             )
-                                        )
+                                        ).collect { messageResponse ->
+                                            messageResponse.fold(onSuccess = {
+
+                                                _mainState.value = mainState.value.copy(
+                                                   onSuccess = true
+                                                )
+                                            },
+                                                onFailure = {
+
+                                                }
+                                            )
+
+                                        }
                                     }
                                 },
                                 onFailure = {

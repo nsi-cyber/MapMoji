@@ -1,8 +1,6 @@
 package com.nsicyber.mojimapper.data.repository
 
 import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.face.Face
-import com.google.mlkit.vision.face.FaceDetector
 import com.google.mlkit.vision.label.ImageLabeler
 import com.nsicyber.mojimapper.domain.repository.MlKitRepository
 import kotlinx.coroutines.Dispatchers
