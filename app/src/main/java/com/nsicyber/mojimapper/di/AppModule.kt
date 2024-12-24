@@ -45,7 +45,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideImageLabeler(): ImageLabeler {
-        val options = ImageLabelerOptions.Builder().setConfidenceThreshold(0.4f).build()
+        val options = ImageLabelerOptions.Builder().setConfidenceThreshold(0.77f).build()
         return ImageLabeling.getClient(options)
     }
 
