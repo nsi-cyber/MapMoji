@@ -6,5 +6,6 @@ data class MainState(
     val mapObject: List<EmojiMapModel> = listOf(),
     val lastLoadedLongitude:Double=0.0,
     val lastLoadedLatitude:Double=0.0,
+    val lastLoadedRadius:Double=0.0,
     val onSuccess:Boolean=false,
 )

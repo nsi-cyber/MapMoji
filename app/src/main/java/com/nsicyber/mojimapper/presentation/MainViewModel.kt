@@ -80,7 +80,8 @@ class MainViewModel @Inject constructor(
                 _mainState.value = mainState.value.copy(
                     mapObject = objects,
                     lastLoadedLatitude = latitude,
-                    lastLoadedLongitude = longitude
+                    lastLoadedLongitude = longitude,
+                    lastLoadedRadius = radius
                 )
             }
         }
