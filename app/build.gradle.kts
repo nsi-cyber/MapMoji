@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.daggerHilt)
     id("com.google.gms.google-services")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("com.google.firebase.crashlytics")
 
 }
 
@@ -19,7 +20,7 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,6 +32,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -104,9 +106,11 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.extensions)
-    implementation("org.tensorflow:tensorflow-lite:2.11.0")
-    implementation("com.google.android.gms:play-services-gcm:17.0.0")
-    implementation ("com.google.mlkit:image-labeling:17.0.9")
-    implementation("com.google.maps.android:maps-compose:4.3.3")
+    implementation(libs.tensorflow.lite)
+    implementation(libs.play.services.gcm)
+    implementation (libs.image.labeling)
+    implementation(libs.maps.compose)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
 
 }
