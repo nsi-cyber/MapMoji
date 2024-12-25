@@ -29,6 +29,8 @@ MapMoji is an innovative Android application that allows users to capture moment
 
 ### Android
 
+- **FireStore**: For storing data.
+- **ML Kit**: For labeling shooted image and converting it to Emoji.
 - **Kotlin**: Used as the programming language for the app.
 - **Android Jetpack**: Modern Android development components:
   - **MutableState**: For observable data holders.
